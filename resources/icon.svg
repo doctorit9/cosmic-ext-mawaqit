@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 128 128" width="128" height="128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1e2e"/>
+      <stop offset="100%" stop-color="#11111b"/>
+    </linearGradient>
+    <linearGradient id="crescentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f9e2af"/>
+      <stop offset="100%" stop-color="#fab387"/>
+    </linearGradient>
+    <linearGradient id="domeGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#89b4fa"/>
+      <stop offset="100%" stop-color="#b4befe"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background rounded squircle -->
+  <rect x="8" y="8" width="112" height="112" rx="28" fill="url(#bgGrad)"/>
+
+  <!-- Subtle star field dots -->
+  <circle cx="34" cy="36" r="1.5" fill="#f9e2af" opacity="0.6"/>
+  <circle cx="92" cy="30" r="1.5" fill="#f9e2af" opacity="0.6"/>
+  <circle cx="102" cy="54" r="1" fill="#f9e2af" opacity="0.5"/>
+  <circle cx="26" cy="62" r="1" fill="#f9e2af" opacity="0.5"/>
+
+  <!-- Crescent Moon -->
+  <path d="M 66 22 C 43.9 22 26 39.9 26 62 C 26 84.1 43.9 102 66 102 C 77.2 102 87.3 97.4 94.6 90 C 72.8 89.2 56 71.8 56 50 C 56 38.6 60.8 28.3 68.6 22.4 C 67.7 22.1 66.9 22 66 22 Z" fill="url(#crescentGrad)"/>
+
+  <!-- Eight-pointed star -->
+  <path d="M 88 38 L 90.5 43.5 L 96 44 L 91.8 48 L 93 53.5 L 88 50.5 L 83 53.5 L 84.2 48 L 80 44 L 85.5 43.5 Z" fill="#f9e2af"/>
+
+  <!-- Mosque Dome and Minaret Silhouette at bottom -->
+  <path d="M 46 96 C 46 78 54 70 64 64 C 74 70 82 78 82 96 Z" fill="url(#domeGrad)" opacity="0.95"/>
+  <rect x="36" y="74" width="7" height="22" rx="1" fill="url(#domeGrad)" opacity="0.85"/>
+  <path d="M 35 74 L 39.5 67 L 44 74 Z" fill="url(#domeGrad)" opacity="0.85"/>
+  <circle cx="39.5" cy="65.5" r="1" fill="#f9e2af"/>
+  <rect x="85" y="74" width="7" height="22" rx="1" fill="url(#domeGrad)" opacity="0.85"/>
+  <path d="M 84 74 L 88.5 67 L 93 74 Z" fill="url(#domeGrad)" opacity="0.85"/>
+  <circle cx="88.5" cy="65.5" r="1" fill="#f9e2af"/>
+  <rect x="28" y="96" width="72" height="6" rx="2" fill="#313244"/>
+</svg>

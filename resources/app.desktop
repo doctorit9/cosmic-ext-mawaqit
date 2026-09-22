@@ -1,0 +1,14 @@
+[Desktop Entry]
+Name=Mawaqit
+Comment=Prayer times applet for COSMIC desktop
+Type=Application
+Icon=io.github.doctorit.mawaqit
+Exec=mawaqit %F
+Terminal=false
+StartupNotify=true
+Categories=COSMIC
+Keywords=COSMIC
+NoDisplay=true
+X-CosmicApplet=true
+X-CosmicHoverPopup=Auto
+MimeType=
