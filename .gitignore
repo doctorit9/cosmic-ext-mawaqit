@@ -11,4 +11,7 @@ debian/*
 !debian/copyright
 !debian/install
 !debian/rules
-!debian/source
+!debian/source*.pid
+*.log
+.gemini/
+.*.pid

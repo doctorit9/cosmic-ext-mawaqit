@@ -308,6 +308,57 @@ impl PrayerKind {
         }
     }
 
+    /// Short Arabic name for compact horizon badges.
+    pub fn short_ar(self) -> &'static str {
+        match self {
+            PrayerKind::Fajr => "فجر",
+            PrayerKind::Sunrise => "شروق",
+            PrayerKind::Dhuhr => "ظهر",
+            PrayerKind::Asr => "عصر",
+            PrayerKind::Maghrib => "مغرب",
+            PrayerKind::Isha => "عشاء",
+        }
+    }
+
+    /// Standard freedesktop symbolic icon representing this celestial/sun phase.
+    #[must_use]
+    pub const fn celestial_icon(self) -> &'static str {
+        match self {
+            PrayerKind::Fajr => "weather-few-clouds-night-symbolic",
+            PrayerKind::Sunrise => "daytime-sunrise-symbolic",
+            PrayerKind::Dhuhr => "weather-clear-symbolic",
+            PrayerKind::Asr => "weather-few-clouds-symbolic",
+            PrayerKind::Maghrib => "daytime-sunset-symbolic",
+            PrayerKind::Isha => "weather-clear-night-symbolic",
+        }
+    }
+
+    /// English description subtitle.
+    #[must_use]
+    pub const fn description_en(self) -> &'static str {
+        match self {
+            PrayerKind::Fajr => "Dawn Prayer",
+            PrayerKind::Sunrise => "Sunrise Horizon",
+            PrayerKind::Dhuhr => "Midday Prayer",
+            PrayerKind::Asr => "Afternoon Prayer",
+            PrayerKind::Maghrib => "Sunset Prayer",
+            PrayerKind::Isha => "Night Prayer",
+        }
+    }
+
+    /// Arabic description subtitle.
+    #[must_use]
+    pub const fn description_ar(self) -> &'static str {
+        match self {
+            PrayerKind::Fajr => "صلاة الفجر",
+            PrayerKind::Sunrise => "شروق الشمس",
+            PrayerKind::Dhuhr => "صلاة الظهر",
+            PrayerKind::Asr => "صلاة العصر",
+            PrayerKind::Maghrib => "صلاة المغرب",
+            PrayerKind::Isha => "صلاة العشاء",
+        }
+    }
+
     /// Whether this event is an obligatory prayer (i.e. not Sunrise).
     #[must_use]
     pub const fn is_prayer(self) -> bool {
@@ -341,6 +392,7 @@ impl DailyTimes {
 }
 
 /// Build `salah` parameters for an AlAdhan-compatible method id + madhab.
+#[allow(dead_code)]
 pub fn parameters_for(method_id: u8, hanafi: bool) -> Parameters {
     parameters_for_with_custom(method_id, hanafi, None, None, None)
 }
@@ -456,7 +508,38 @@ pub fn method_label(method_id: u8) -> &'static str {
     }
 }
 
+/// Detailed parameters description for a method id (Fajr/Isha angles or interval).
+pub fn method_specs(method_id: u8) -> &'static str {
+    match method_id {
+        0 => "Fajr: 16.0° • Maghrib: 4.0° • Isha: 14.0° (Institute of Geophysics, Tehran / Qum)",
+        1 => "Fajr: 18.0° • Isha: 18.0° (University of Islamic Sciences, Karachi)",
+        2 => "Fajr: 15.0° • Isha: 15.0° (Islamic Society of North America - ISNA)",
+        3 => "Fajr: 18.0° • Isha: 17.0° (Muslim World League - MWL)",
+        4 => "Fajr: 18.5° • Isha: +90 min after Maghrib (Umm al-Qura, Makkah)",
+        5 => "Fajr: 19.5° • Isha: 17.5° (Egyptian General Authority of Survey)",
+        7 => "Fajr: 17.7° • Maghrib: 4.5° • Isha: 14.0° (Institute of Geophysics, Tehran)",
+        8 => "Fajr: 19.5° • Isha: +90 min after Maghrib (Gulf Region)",
+        9 => "Fajr: 18.0° • Isha: 17.5° (Ministry of Awqaf, Kuwait)",
+        10 => "Fajr: 18.0° • Isha: +90 min after Maghrib (Qatar)",
+        11 => "Fajr: 20.0° • Isha: 18.0° (MUIS, Singapore)",
+        12 => "Fajr: 12.0° • Isha: 12.0° (Union des Organisations Islamiques de France)",
+        13 => "Fajr: 18.0° • Isha: 17.0° (Diyanet İşleri Başkanlığı, Turkey)",
+        14 => "Fajr: 16.0° • Isha: 15.0° (Spiritual Administration of Muslims of Russia)",
+        15 => "Fajr: 18.0° • Isha: 18.0° (Moonsighting Committee Worldwide)",
+        16 => "Fajr: 18.2° • Isha: 18.2° (Awqaf and Islamic Affairs, Dubai/UAE)",
+        17 => "Fajr: 20.0° • Isha: 18.0° (Jabatan Kemajuan Islam Malaysia - JAKIM)",
+        18 => "Fajr: 18.0° • Isha: 18.0° (Ministry of Religious Affairs, Tunisia)",
+        19 => "Fajr: 18.0° • Isha: 17.0° (Ministry of Religious Affairs, Algeria)",
+        20 => "Fajr: 20.0° • Isha: 18.0° (Kementerian Agama Republik Indonesia)",
+        21 => "Fajr: 19.0° • Isha: 17.0° (Ministry of Habous & Islamic Affairs, Morocco)",
+        22 => "Fajr: 12.0° • Isha: 12.0° (Comunidade Islâmica de Lisboa)",
+        23 => "Fajr: 18.0° • Isha: 18.0° (Ministry of Awqaf & Islamic Affairs, Jordan)",
+        _ => method_specs(DEFAULT_METHOD_ID),
+    }
+}
+
 /// Compute one civil day's times (date interpreted in `tz`).
+#[allow(dead_code)]
 pub fn compute_day(
     date: NaiveDate,
     latitude: f64,

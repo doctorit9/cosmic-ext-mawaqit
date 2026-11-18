@@ -3,6 +3,7 @@
 mod app;
 mod config;
 mod i18n;
+mod notifications;
 mod prayer;
 
 fn main() -> cosmic::iced::Result {

@@ -12,7 +12,13 @@ widget), rebuilt as a native COSMIC applet in Rust.
 - **AlAdhan-compatible method IDs**, so times can be compared 1:1 with
   `omaprayers` and [AlAdhan](https://aladhan.com/prayer-times-api).
 - **Bilingual labels** (English + Arabic prayer names out of the box; full
-  Arabic RTL UI is on the roadmap).
+  Arabic RTL UI via fluent i18n).
+- **Notifications & Adhan audio**: per-prayer toggles, customizable pre-prayer
+  reminder (minutes before, message template with `{prayer}`/`{minutes}`/
+  `{time}`/`{city}` placeholders), authentic Adhan audio with 7 famous
+  reciters (Makkah, Madinah, Al-Aqsa, Mishary Alafasy, Abdul Basit, Muhammad Refaat,
+  Mustafa Ismail), custom sound file selection (`.mp3`, `.ogg`, `.wav`),
+  volume slider, instant mute/stop banner, and automatic offline caching.
 - **No telemetry, no accounts.**
 
 ## Validation
@@ -48,9 +54,9 @@ tuning is on the roadmap.
 
 ## Build & run
 
-Requires a COSMIC development environment (Wayland libs etc. — this builds
-on Fedora COSMIC out of the box). `just` recipes mirror other COSMIC
-applets (`casey/just`):
+Requires a COSMIC development environment (Wayland libs etc. — this builds on
+Fedora COSMIC out of the box). `just` recipes mirror other COSMIC applets
+(`casey/just`):
 
 ```sh
 just build-release   # cargo build --release
@@ -62,6 +68,11 @@ just test            # cargo test (prayer engine)
 
 Without `just`, plain `cargo build` / `cargo test` work.
 
+`libcosmic` is pinned to `master` via git. If you hit API errors after a
+dependency update (e.g. missing `theme::Svg` variants), run
+`cargo update -p libcosmic` to re-resolve against current master before
+reporting a build failure.
+
 ## Status
 
 - [x] Milestone 1 — scaffold, offline times, popup schedule (Cairo default)
@@ -70,9 +81,13 @@ Without `just`, plain `cargo build` / `cargo test` work.
   settings persisted via `cosmic-config`
 - [x] In-app city & location presets (Cairo, Makkah, Madinah, Jerusalem, Istanbul, Dubai, London, NYC, etc.)
 - [x] Hero Next/Current prayer card with live countdown pill & status indicators
-- [ ] Milestone 3 — full settings (per-prayer tuning, custom angles)
+- [x] Milestone 3 — per-prayer minute adjustments + custom calculation angles
+  (Fajr/Isha angle, Isha interval after Maghrib)
 - [ ] Milestone 4 — GeoClue2 automatic location + manual fallback
-- [ ] Milestone 5 — notifications + Adhan audio
+- [x] Milestone 5 — notifications & authentic Adhan audio: 7 authentic Adhan
+  reciters (Makkah, Madinah, Al-Aqsa, Alafasy, Abdul Basit, Refaat, Mustafa Ismail),
+  custom audio file support, volume slider, quick mute & live Stop button,
+  automatic CDN download and offline caching.
 - [x] Milestone 6 — full Arabic/English i18n + RTL
 - [x] Milestone 7 — icon set (`resources/icon.svg`), packaging
 
