@@ -89,7 +89,7 @@ pub enum Message {
     TogglePopup,
     PopupClosed(Id),
     Tick,
-    UpdateConfig(Config),
+    UpdateConfig(Box<Config>),
     SetViewMode(ViewMode),
     SelectSettingsTab(segmented_button::Entity),
     OpenAlertsSettings,
@@ -1952,15 +1952,15 @@ impl cosmic::Application for AppModel {
                         .into(),
                     );
                 }
-                if self.config.show_celestial_horizon {
-                    if let Some(horizon) = self.view_celestial_horizon() {
-                        children.push(horizon);
-                    }
+                if self.config.show_celestial_horizon
+                    && let Some(horizon) = self.view_celestial_horizon()
+                {
+                    children.push(horizon);
                 }
-                if self.config.show_hero_card {
-                    if let Some(hero) = self.view_hero_card() {
-                        children.push(hero);
-                    }
+                if self.config.show_hero_card
+                    && let Some(hero) = self.view_hero_card()
+                {
+                    children.push(hero);
                 }
                 children.push(self.view_schedule());
                 let column_spacing = if self.config.compact_mode {
@@ -2014,7 +2014,7 @@ impl cosmic::Application for AppModel {
             // Watch for application configuration changes.
             self.core()
                 .watch_config::<Config>(Self::APP_ID)
-                .map(|update| Message::UpdateConfig(update.config)),
+                .map(|update| Message::UpdateConfig(Box::new(update.config))),
         ])
     }
 
@@ -2027,7 +2027,7 @@ impl cosmic::Application for AppModel {
                 return self.check_and_dispatch_alerts();
             }
             Message::UpdateConfig(config) => {
-                self.config = config;
+                self.config = *config;
                 self.refresh_schedule();
             }
             Message::SetViewMode(mode) => {
@@ -2133,12 +2133,12 @@ impl cosmic::Application for AppModel {
                     self.config.custom_angles.fajr_angle = None;
                     self.save_config();
                     self.refresh_schedule();
-                } else if let Ok(angle) = trimmed.parse::<f64>() {
-                    if (0.0..=30.0).contains(&angle) {
-                        self.config.custom_angles.fajr_angle = Some(angle);
-                        self.save_config();
-                        self.refresh_schedule();
-                    }
+                } else if let Ok(angle) = trimmed.parse::<f64>()
+                    && (0.0..=30.0).contains(&angle)
+                {
+                    self.config.custom_angles.fajr_angle = Some(angle);
+                    self.save_config();
+                    self.refresh_schedule();
                 }
             }
             Message::SetIshaAngle(value) => {
@@ -2147,12 +2147,12 @@ impl cosmic::Application for AppModel {
                     self.config.custom_angles.isha_angle = None;
                     self.save_config();
                     self.refresh_schedule();
-                } else if let Ok(angle) = trimmed.parse::<f64>() {
-                    if (0.0..=30.0).contains(&angle) {
-                        self.config.custom_angles.isha_angle = Some(angle);
-                        self.save_config();
-                        self.refresh_schedule();
-                    }
+                } else if let Ok(angle) = trimmed.parse::<f64>()
+                    && (0.0..=30.0).contains(&angle)
+                {
+                    self.config.custom_angles.isha_angle = Some(angle);
+                    self.save_config();
+                    self.refresh_schedule();
                 }
             }
             Message::SetIshaInterval(value) => {
@@ -2371,10 +2371,13 @@ impl cosmic::Application for AppModel {
                 return if let Some(p) = self.popup.take() {
                     destroy_popup(p)
                 } else {
+                    let Some(main_id) = self.core.main_window_id() else {
+                        return Task::none();
+                    };
                     let new_id = Id::unique();
                     self.popup.replace(new_id);
                     let mut popup_settings = self.core.applet.get_popup_settings(
-                        self.core.main_window_id().unwrap(),
+                        main_id,
                         new_id,
                         None,
                         None,

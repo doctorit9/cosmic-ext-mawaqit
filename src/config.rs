@@ -84,15 +84,49 @@ impl FontFamilyChoice {
     }
 }
 
-fn intern_font_name(name: &str) -> &'static str {
-    static FONT_POOL: LazyLock<Mutex<HashSet<&'static str>>> =
-        LazyLock::new(|| Mutex::new(HashSet::new()));
+/// Maximum number of custom font names that may be interned into static memory.
+/// Prevents unbounded memory leaks if custom names are typed repeatedly in the GUI.
+const MAX_INTERNED_FONTS: usize = 32;
 
-    let mut pool = FONT_POOL.lock().unwrap();
-    if let Some(&existing) = pool.get(name) {
+static FONT_POOL: LazyLock<Mutex<HashSet<&'static str>>> =
+    LazyLock::new(|| Mutex::new(HashSet::new()));
+
+#[cfg(test)]
+pub(crate) fn interned_font_count() -> usize {
+    let pool = match FONT_POOL.lock() {
+        Ok(guard) => guard,
+        Err(poisoned) => poisoned.into_inner(),
+    };
+    pool.len()
+}
+
+fn intern_font_name(name: &str) -> &'static str {
+    // Sanitize input: strip control characters and cap at 64 characters
+    let sanitized: String = name
+        .chars()
+        .filter(|c| !c.is_control())
+        .take(64)
+        .collect();
+    let trimmed = sanitized.trim();
+    if trimmed.is_empty() {
+        return "";
+    }
+
+    let mut pool = match FONT_POOL.lock() {
+        Ok(guard) => guard,
+        Err(poisoned) => poisoned.into_inner(),
+    };
+
+    if let Some(&existing) = pool.get(trimmed) {
         return existing;
     }
-    let leaked: &'static str = Box::leak(name.to_string().into_boxed_str());
+
+    // Strict memory cap: do not leak beyond the upper bound
+    if pool.len() >= MAX_INTERNED_FONTS {
+        return pool.iter().next().copied().unwrap_or("");
+    }
+
+    let leaked: &'static str = Box::leak(trimmed.to_string().into_boxed_str());
     pool.insert(leaked);
     leaked
 }
@@ -138,7 +172,7 @@ pub struct PrayerAdjustments {
 }
 
 /// Custom calculation angles for prayer times.
-#[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Default, serde::Serialize, serde::Deserialize)]
 pub struct CustomAngles {
     /// Fajr angle in degrees (default varies by method).
     pub fajr_angle: Option<f64>,
@@ -146,16 +180,6 @@ pub struct CustomAngles {
     pub isha_angle: Option<f64>,
     /// Isha interval in minutes after Maghrib (0-255, default varies by method).
     pub isha_interval: Option<u8>,
-}
-
-impl Default for CustomAngles {
-    fn default() -> Self {
-        Self {
-            fajr_angle: None,
-            isha_angle: None,
-            isha_interval: None,
-        }
-    }
 }
 
 #[derive(Debug, Clone, CosmicConfigEntry, PartialEq)]
@@ -456,5 +480,17 @@ mod tests {
         assert_eq!(config.panel_font_size, 0);
         assert_eq!(config.popup_font_scale, 100);
         assert!(config.custom_font_family.is_empty());
+    }
+
+    #[test]
+    fn test_intern_font_name_bounded_memory() {
+        let cleaned = intern_font_name("Inter\n\rFont");
+        assert_eq!(cleaned, "InterFont");
+
+        for i in 0..100 {
+            let _ = intern_font_name(&format!("TestFont_{i}"));
+        }
+
+        assert!(interned_font_count() <= MAX_INTERNED_FONTS);
     }
 }

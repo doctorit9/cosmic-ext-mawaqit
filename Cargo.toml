@@ -20,6 +20,7 @@ salah = "0.7"
 hijri_date = "0.5"
 serde = { version = "1", features = ["derive"] }
 zbus = { version = "5", default-features = false, features = ["tokio"] }
+libc = "0.2"
 
 [dependencies.i18n-embed]
 version = "0.16"

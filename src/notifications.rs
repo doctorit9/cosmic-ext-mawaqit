@@ -116,19 +116,20 @@ pub fn stop_audio() {
     let pid = PLAYING_PID.swap(0, Ordering::SeqCst);
     IS_PLAYING.store(false, Ordering::SeqCst);
     if pid > 0 {
-        let _ = std::process::Command::new("kill")
-            .args(["-15", &pid.to_string()])
-            .status();
+        // Send SIGTERM directly via POSIX kill syscall (avoids spawning /bin/kill)
+        unsafe {
+            libc::kill(pid as libc::pid_t, libc::SIGTERM);
+        }
     }
 }
 
 /// Path to local audio cache directory: `$XDG_DATA_HOME/mawaqit/sounds` or `~/.local/share/mawaqit/sounds`.
 #[must_use]
 pub fn sounds_dir() -> PathBuf {
-    if let Ok(data_home) = std::env::var("XDG_DATA_HOME") {
-        if !data_home.is_empty() {
-            return PathBuf::from(data_home).join("mawaqit").join("sounds");
-        }
+    if let Ok(data_home) = std::env::var("XDG_DATA_HOME")
+        && !data_home.is_empty()
+    {
+        return PathBuf::from(data_home).join("mawaqit").join("sounds");
     }
     if let Ok(home) = std::env::var("HOME") {
         return PathBuf::from(home)
@@ -137,7 +138,7 @@ pub fn sounds_dir() -> PathBuf {
             .join("mawaqit")
             .join("sounds");
     }
-    PathBuf::from("/tmp/mawaqit-sounds")
+    std::env::temp_dir().join("mawaqit-sounds")
 }
 
 /// Check whether the audio file for a given voice is cached locally on disk.
@@ -175,7 +176,9 @@ pub async fn ensure_voice_cached(voice: AdhanVoice) -> Result<PathBuf, String> {
 
     let tmp_dest = dir.join(format!("{filename}.tmp.{}", std::process::id()));
     let output = tokio::process::Command::new("curl")
-        .args(["-s", "-f", "-L", "-o", tmp_dest.to_str().unwrap(), url])
+        .args(["-s", "-f", "-L", "--max-time", "30", "-o"])
+        .arg(&tmp_dest)
+        .arg(url)
         .output()
         .await
         .map_err(|e| format!("curl download failed: {e}"))?;
@@ -209,8 +212,11 @@ pub async fn play_voice_sound(
         AdhanVoice::SystemBell => play_bell_sound(volume).await,
         AdhanVoice::CustomFile => {
             let path = Path::new(custom_path);
-            if !path.exists() {
-                return Err(format!("Custom sound file not found: {custom_path}"));
+            let metadata = tokio::fs::metadata(path)
+                .await
+                .map_err(|e| format!("Custom sound file cannot be read: {e}"))?;
+            if !metadata.is_file() {
+                return Err("Custom sound path is not a regular file".to_string());
             }
             let path_str = path
                 .to_str()
@@ -239,12 +245,19 @@ pub async fn play_voice_sound(
 }
 
 fn play_file_blocking(path_str: &str, volume: u8) -> Result<(), String> {
+    let path = Path::new(path_str);
+    let metadata = std::fs::metadata(path).map_err(|e| format!("Cannot read file: {e}"))?;
+    if !metadata.is_file() {
+        return Err("Sound path is not a regular file".to_string());
+    }
+
     let vol_pct = volume.min(100);
     let vol_str = format!("--volume={vol_pct}");
 
     // 1. Try mpv (supports mp3, volume flag, quiet, headless)
+    // Pass "--" before path_str to prevent option injection
     if let Ok(mut child) = std::process::Command::new("mpv")
-        .args(["--no-video", "--really-quiet", &vol_str, path_str])
+        .args(["--no-video", "--really-quiet", &vol_str, "--", path_str])
         .spawn()
     {
         let id = child.id();
@@ -261,7 +274,7 @@ fn play_file_blocking(path_str: &str, volume: u8) -> Result<(), String> {
     // 2. Try pw-play (PipeWire native)
     let pw_vol = format!("{:.2}", f32::from(vol_pct) / 100.0);
     if let Ok(mut child) = std::process::Command::new("pw-play")
-        .args(["--volume", &pw_vol, path_str])
+        .args(["--volume", &pw_vol, "--", path_str])
         .spawn()
     {
         let id = child.id();
@@ -278,7 +291,7 @@ fn play_file_blocking(path_str: &str, volume: u8) -> Result<(), String> {
     // 3. Try paplay (PulseAudio)
     let pa_vol = u32::from(vol_pct) * 65536 / 100;
     if let Ok(mut child) = std::process::Command::new("paplay")
-        .args(["--volume", &pa_vol.to_string(), path_str])
+        .args(["--volume", &pa_vol.to_string(), "--", path_str])
         .spawn()
     {
         let id = child.id();
@@ -301,6 +314,7 @@ fn play_file_blocking(path_str: &str, volume: u8) -> Result<(), String> {
 /// Returns `Ok(None)` when both notification and optional sound succeed,
 /// `Ok(Some(warning))` when the desktop notification succeeded but audio playback failed,
 /// or `Err(error)` when D-Bus notification delivery failed.
+#[allow(clippy::too_many_arguments)]
 pub async fn dispatch_notification(
     app_id: &str,
     summary: String,

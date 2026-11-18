@@ -552,6 +552,7 @@ pub fn compute_day(
 }
 
 /// Compute one civil day's times with custom angles and time adjustments.
+#[allow(clippy::too_many_arguments)]
 pub fn compute_day_with_adjustments(
     date: NaiveDate,
     latitude: f64,
