@@ -1,5 +1,7 @@
 # Mawaqit (مواقيت) — Prayer Times Applet for COSMIC
 
+[English](README.md) • [العربية](README.ar.md)
+
 A COSMIC panel applet showing Islamic prayer times: the next prayer + live
 countdown in the panel, and a popup with the full day's schedule, Hijri date,
 and quick settings. Inspired by
