@@ -121,7 +121,7 @@ fn intern_font_name(name: &str) -> &'static str {
         return existing;
     }
 
-    // Strict memory cap: do not leak beyond the upper bound
+    // Memory cap: reuse existing entry if full
     if pool.len() >= MAX_INTERNED_FONTS {
         return pool.iter().next().copied().unwrap_or("");
     }
@@ -464,7 +464,7 @@ mod tests {
         assert_eq!(FontFamilyChoice::NotoSans.family_name(""), "Noto Sans");
         assert_eq!(FontFamilyChoice::NotoKufiArabic.family_name(""), "Noto Kufi Arabic");
         assert_eq!(FontFamilyChoice::Cairo.family_name(""), "Cairo");
-        assert_eq!(FontFamilyChoice::Custom.family_name("  Inter  "), "Inter");
+        assert_eq!(FontFamilyChoice::Custom.family_name("  Amiri  "), "Amiri");
         assert_eq!(FontFamilyChoice::Custom.family_name(""), "");
     }
 
