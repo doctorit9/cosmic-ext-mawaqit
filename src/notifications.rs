@@ -185,6 +185,8 @@ pub async fn ensure_voice_cached(voice: AdhanVoice) -> Result<PathBuf, String> {
             "--tlsv1.2",
             "--max-time",
             "30",
+            "--max-filesize",
+            "15000000",
             "-o",
         ])
         .arg(&tmp_dest)
