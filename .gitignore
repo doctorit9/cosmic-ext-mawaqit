@@ -11,7 +11,10 @@ debian/*
 !debian/copyright
 !debian/install
 !debian/rules
-!debian/source*.pid
+!debian/source/
 *.log
-.gemini/
+*.pid
 .*.pid
+.gemini/
+.impeccable/
+.zed/
