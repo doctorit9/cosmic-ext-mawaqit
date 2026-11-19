@@ -176,8 +176,19 @@ pub async fn ensure_voice_cached(voice: AdhanVoice) -> Result<PathBuf, String> {
 
     let tmp_dest = dir.join(format!("{filename}.tmp.{}", std::process::id()));
     let output = tokio::process::Command::new("curl")
-        .args(["-s", "-f", "-L", "--max-time", "30", "-o"])
+        .args([
+            "-s",
+            "-f",
+            "-L",
+            "--proto",
+            "=https",
+            "--tlsv1.2",
+            "--max-time",
+            "30",
+            "-o",
+        ])
         .arg(&tmp_dest)
+        .arg("--")
         .arg(url)
         .output()
         .await
