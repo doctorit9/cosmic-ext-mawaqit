@@ -1,0 +1,30 @@
+# Maintainer: doctorit9 <https://github.com/doctorit9>
+pkgname=cosmic-ext-mawaqit-git
+_pkgname=cosmic-ext-mawaqit
+pkgver=0.1.0.r0
+pkgrel=1
+pkgdesc="Islamic prayer times applet for COSMIC Desktop (Mawaqit مواقيت)"
+arch=('x86_64' 'aarch64')
+url="https://github.com/doctorit9/cosmic-ext-mawaqit"
+license=('MIT')
+depends=('libxkbcommon' 'wayland' 'alsa-lib')
+makedepends=('git' 'rust' 'cargo' 'just')
+provides=("$_pkgname")
+conflicts=("$_pkgname")
+source=("git+https://github.com/doctorit9/cosmic-ext-mawaqit.git")
+sha256sums=('SKIP')
+
+pkgver() {
+    cd "$srcdir/$_pkgname"
+    printf "0.1.0.r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+build() {
+    cd "$srcdir/$_pkgname"
+    just build-release
+}
+
+package() {
+    cd "$srcdir/$_pkgname"
+    just rootdir="$pkgdir" prefix="/usr" install
+}

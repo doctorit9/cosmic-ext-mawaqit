@@ -50,3 +50,18 @@ features = [
 # libcosmic = { path = "../libcosmic" }
 # cosmic-config = { path = "../libcosmic/cosmic-config" }
 # cosmic-theme = { path = "../libcosmic/cosmic-theme" }
+
+[package.metadata.deb]
+name = "cosmic-ext-mawaqit"
+maintainer = "doctorit9 <https://github.com/doctorit9>"
+copyright = "2026 doctorit9"
+extended-description = "Islamic prayer times applet for COSMIC Desktop (Mawaqit مواقيت)"
+section = "utils"
+priority = "optional"
+depends = "$auto, libasound2, libwayland-client0, libxkbcommon0"
+assets = [
+    ["target/release/mawaqit", "usr/bin/mawaqit", "755"],
+    ["resources/app.desktop", "usr/share/applications/io.github.doctorit.mawaqit.desktop", "644"],
+    ["resources/app.metainfo.xml", "usr/share/appdata/io.github.doctorit.mawaqit.metainfo.xml", "644"],
+    ["resources/icon.svg", "usr/share/icons/hicolor/scalable/apps/io.github.doctorit.mawaqit.svg", "644"],
+]

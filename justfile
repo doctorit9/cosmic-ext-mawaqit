@@ -65,6 +65,10 @@ install:
 uninstall:
     rm {{bin-dst}} {{desktop-dst}} {{icon-dst}}
 
+# Builds a .deb package using cargo-deb
+deb: build-release
+    cargo deb --no-build
+
 # Vendor dependencies locally
 vendor:
     mkdir -p .cargo

@@ -1,0 +1,36 @@
+app-id: io.github.doctorit.mawaqit
+runtime: org.freedesktop.Platform
+runtime-version: '24.08'
+sdk: org.freedesktop.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.rust-stable
+command: mawaqit
+
+finish-args:
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --socket=pulseaudio
+  - --share=ipc
+  - --share=network
+  - --talk-name=org.freedesktop.Notifications
+  - --talk-name=com.system76.CosmicApplet
+  - --talk-name=com.system76.CosmicSettings
+
+build-options:
+  append-path: /usr/lib/sdk/rust-stable/bin
+  env:
+    CARGO_HOME: /run/build/mawaqit/cargo
+
+modules:
+  - name: mawaqit
+    buildsystem: simple
+    build-commands:
+      - cargo build --release
+      - install -Dm0755 target/release/mawaqit /app/bin/mawaqit
+      - install -Dm0644 resources/app.desktop /app/share/applications/io.github.doctorit.mawaqit.desktop
+      - install -Dm0644 resources/app.metainfo.xml /app/share/appdata/io.github.doctorit.mawaqit.metainfo.xml
+      - install -Dm0644 resources/icon.svg /app/share/icons/hicolor/scalable/apps/io.github.doctorit.mawaqit.svg
+    sources:
+      - type: git
+        url: https://github.com/doctorit9/cosmic-ext-mawaqit.git
+        branch: main
