@@ -69,6 +69,10 @@ uninstall:
 deb: build-release
     cargo deb --no-build
 
+# Builds a .rpm package using cargo-generate-rpm
+rpm: build-release
+    cargo generate-rpm
+
 # Vendor dependencies locally
 vendor:
     mkdir -p .cargo

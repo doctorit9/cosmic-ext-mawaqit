@@ -65,3 +65,15 @@ assets = [
     ["resources/app.metainfo.xml", "usr/share/appdata/io.github.doctorit.mawaqit.metainfo.xml", "644"],
     ["resources/icon.svg", "usr/share/icons/hicolor/scalable/apps/io.github.doctorit.mawaqit.svg", "644"],
 ]
+
+[package.metadata.generate-rpm]
+name = "cosmic-ext-mawaqit"
+summary = "Islamic prayer times applet for COSMIC Desktop (Mawaqit مواقيت)"
+license = "MIT"
+assets = [
+    { source = "target/release/mawaqit", dest = "/usr/bin/mawaqit", mode = "755" },
+    { source = "resources/app.desktop", dest = "/usr/share/applications/io.github.doctorit.mawaqit.desktop", mode = "644" },
+    { source = "resources/app.metainfo.xml", dest = "/usr/share/appdata/io.github.doctorit.mawaqit.metainfo.xml", mode = "644" },
+    { source = "resources/icon.svg", dest = "/usr/share/icons/hicolor/scalable/apps/io.github.doctorit.mawaqit.svg", mode = "644" },
+]
+
