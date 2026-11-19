@@ -59,8 +59,8 @@
 
 1. استنسخ المستودع:
    ```sh
-   git clone https://github.com/doctorit9/omaprayer-comsic.git
-   cd omaprayer-comsic
+   git clone https://github.com/doctorit9/cosmic-ext-mawaqit.git
+   cd cosmic-ext-mawaqit
    ```
 
 2. بناء النسخة المحسّنة (Release):

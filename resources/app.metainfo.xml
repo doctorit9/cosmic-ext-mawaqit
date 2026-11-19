@@ -6,9 +6,9 @@
   <name>Mawaqit</name>
   <summary>Prayer times applet for COSMIC desktop</summary>
   <icon type="remote" width="64" height="64" scale="1">
-    https://github.com/doctorit/omaprayer-comsic/raw/main/resources/icons/hicolor/scalable/apps/icon.svg
+    https://github.com/doctorit9/cosmic-ext-mawaqit/raw/main/resources/icons/hicolor/scalable/apps/icon.svg
   </icon>
-  <url type="vcs-browser">https://github.com/doctorit/omaprayer-comsic</url>
+  <url type="vcs-browser">https://github.com/doctorit9/cosmic-ext-mawaqit</url>
   <launchable type="desktop-id">io.github.doctorit.mawaqit.desktop</launchable>
   <provides>
     <id>com.system76.CosmicApplet</id>

@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 license = "MIT"
 description = "Prayer times applet for COSMIC desktop (Mawaqit مواقيت)"
-repository = "https://github.com/doctorit/omaprayer-comsic"
+repository = "https://github.com/doctorit9/cosmic-ext-mawaqit"
 
 [build-dependencies]
 xdgen = "0.1"
